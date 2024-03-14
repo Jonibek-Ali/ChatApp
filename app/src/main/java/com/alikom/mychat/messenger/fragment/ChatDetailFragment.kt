@@ -20,6 +20,34 @@ import com.alikom.mychat.messenger.model.ChatDetailModel
 class ChatDetailFragment : Fragment(R.layout.fragment_chat_detail),
     ChatDetailAdapter.ItemClickListener {
 
+    val data = listOf(
+        ChatDetailModel.FriendMessage(
+            mesage = "Looking forward to the trip.",
+            avatar = R.drawable.ic_bryin
+        ),
+        ChatDetailModel.MyMessage(
+            "Same! Can’t wait."
+        ),
+        ChatDetailModel.FriendImageMessage(
+            description = "Looking forward to the trip.",
+            link = "https://stackoverflow.com/",
+            avatar = R.drawable.ic_bryin,
+            image = R.drawable.ic_conyon,
+        ),
+        ChatDetailModel.FriendMessage(
+            mesage = "What do you think?",
+            avatar = R.drawable.ic_bryin
+        ),
+        ChatDetailModel.MyMessage(
+            "Oh yes this looks great!"
+        ),
+    )
+    val chatDetailAdapter = ChatDetailAdapter(
+        this@ChatDetailFragment
+    ).apply {
+        updateData(data)
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -30,31 +58,8 @@ class ChatDetailFragment : Fragment(R.layout.fragment_chat_detail),
         appCompatActivity.supportActionBar?.title = "ToolBarFragment"
 
         view.findViewById<RecyclerView>(R.id.chat_detail_recyclerView).apply {
-            adapter = ChatDetailAdapter(
-                listOf(
-                    ChatDetailModel.FriendMessage(
-                        mesage = "Looking forward to the trip.",
-                        avatar = R.drawable.ic_bryin
-                    ),
-                    ChatDetailModel.MyMessage(
-                        "Same! Can’t wait."
-                    ),
-                    ChatDetailModel.FriendImageMessage(
-                        description = "Looking forward to the trip.",
-                        link = "https://stackoverflow.com/",
-                        avatar = R.drawable.ic_bryin,
-                        image = R.drawable.ic_conyon,
-                    ),
-                    ChatDetailModel.FriendMessage(
-                        mesage = "What do you think?",
-                        avatar = R.drawable.ic_bryin
-                    ),
-                    ChatDetailModel.MyMessage(
-                        "Oh yes this looks great!"
-                    ),
-                ),
-                this@ChatDetailFragment
-            )
+
+            adapter = chatDetailAdapter
         }
 
         setHasOptionsMenu(true)
@@ -70,8 +75,24 @@ class ChatDetailFragment : Fragment(R.layout.fragment_chat_detail),
                     }
 
                     override fun onQueryTextChange(newText: String?): Boolean {
-                        TODO("Not yet implemented")
-                        
+                        if (newText.isNullOrEmpty()){
+                            chatDetailAdapter.updateData(data)
+                        }else{
+                            val items = data.filter {
+                                when (it) {
+                                    is ChatDetailModel.FriendImageMessage -> it.description.lowercase()
+                                        .contains(newText.lowercase())
+
+                                    is ChatDetailModel.FriendMessage -> it.mesage.lowercase()
+                                        .contains(newText.lowercase())
+
+                                    is ChatDetailModel.MyMessage -> it.message.lowercase()
+                                        .contains(newText.lowercase())
+                                }
+                            }
+                            chatDetailAdapter.updateData(items)
+                        }
+                        return true
                     }
                 })
             }

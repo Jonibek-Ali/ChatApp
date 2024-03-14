@@ -15,9 +15,15 @@ import com.alikom.mychat.R
 import com.alikom.mychat.messenger.model.ChatDetailModel
 
 class ChatDetailAdapter(
-    val items: List<ChatDetailModel>,
     private val listener: ItemClickListener
 ) : RecyclerView.Adapter<BaseViewHolder<ChatDetailModel>>() {
+
+    private var items: List<ChatDetailModel> = listOf()
+    fun updateData(items: List<ChatDetailModel>) {
+        this.items = items
+        notifyDataSetChanged()
+    }
+
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
@@ -152,6 +158,7 @@ class FriedImageMessageViewHolder(v: View) : BaseViewHolder<ChatDetailModel>(v) 
             v.context.startActivity(intent)
         }
     }
+
     override fun bind(item: ChatDetailModel) {
         if (item is ChatDetailModel.FriendImageMessage) {
             avatar.setImageResource(item.avatar)
